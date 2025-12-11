@@ -192,7 +192,7 @@ const Header = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">Developed By</span>
-                <span className="text-xs font-medium text-primary">Ar Abir</span>
+                <span className="text-xs font-medium text-primary">MI Mazharul</span>
               </div>
             </div>
           </>
