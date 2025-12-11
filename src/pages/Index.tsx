@@ -4,6 +4,7 @@ import GenerationControls from "@/components/GenerationControls";
 import FileUpload from "@/components/FileUpload";
 import ResultsPanel from "@/components/ResultsPanel";
 import HowToUseButton from "@/components/HowToUseButton";
+import { generateMetadataForMultipleFiles } from "@/lib/metadataGenerator";
 
 interface GenerationSettings {
   titleLength: number;
@@ -77,18 +78,25 @@ const Index = () => {
     
     setIsGenerating(true);
     
-    // Simulate generation (in real app, this would call AI API)
-    setTimeout(() => {
+    try {
+      // Generate metadata for all files
+      const metadataResults = await generateMetadataForMultipleFiles(files, settings);
+      
+      // Create results with generated metadata
       const newResults: Result[] = files.map((file, i) => ({
         id: `${Date.now()}-${i}`,
         filename: file.name,
-        title: `Generated title for ${file.name}`,
-        description: `AI-generated description for the image ${file.name}. This would contain relevant metadata for stock photo platforms.`,
-        keywords: ["stock", "photo", "image", "digital", "creative", "design", "professional", "high-quality"],
+        title: metadataResults[i].title,
+        description: metadataResults[i].shortDescription,
+        keywords: metadataResults[i].keywords,
       }));
+      
       setResults(newResults);
+    } catch (error) {
+      console.error("Error generating metadata:", error);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const handleExport = () => {
