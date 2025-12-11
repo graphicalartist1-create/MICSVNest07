@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Copy, Check, ExternalLink, Sparkles, Zap, Cpu, Route, Bolt } from "lucide-react";
+import { Copy, Check, ExternalLink, Sparkles, Zap, Cpu, Route, Bolt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -75,12 +75,6 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border border-border">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0">
           <DialogTitle className="text-2xl font-bold text-foreground">API Secrets Management</DialogTitle>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="p-1 hover:bg-secondary rounded-lg transition-colors"
-          >
-            <X className="h-6 w-6 text-foreground" />
-          </button>
         </DialogHeader>
 
         <div className="text-sm text-muted-foreground mb-6">
