@@ -106,9 +106,9 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         </div>
 
         {/* Provider Selection */}
-        <div className="mb-1 -mt-1">
-          <h3 className="text-[12px] font-semibold text-foreground mb-0">Select AI Provider</h3>
-          <div className="flex flex-wrap gap-1 -mt-1">
+        <div className="mb-2 mt-1">
+          <h3 className="text-[12px] font-semibold text-foreground mb-1">Select AI Provider</h3>
+          <div className="flex flex-wrap gap-2">
             {providers.map((provider) => {
               const IconComponent = provider.icon;
               return (
@@ -134,7 +134,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 mt-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-2">
           {/* Left: Configuration */}
           <div className="border border-border rounded-lg p-1 bg-secondary/30">
             <h3 className="text-[13px] font-semibold text-foreground mb-0">
@@ -358,7 +358,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         </div>
 
         {/* Close Button */}
-        <div className="flex justify-end gap-2 mt-1 pt-0">
+        <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-border">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
