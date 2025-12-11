@@ -26,7 +26,7 @@ const ResultsPanel = ({ results }: ResultsPanelProps) => {
 
   if (results.length === 0) {
     return (
-      <div className="bg-card rounded-lg border border-border p-8 text-center">
+      <div className="text-center">
         <ImageIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
         <p className="text-primary text-lg mb-2">Your generated results will appear here.</p>
         <p className="text-muted-foreground">
@@ -41,13 +41,13 @@ const ResultsPanel = ({ results }: ResultsPanelProps) => {
   return (
     <div className="space-y-6">
       {/* Results List */}
-      <div className="bg-card rounded-lg border border-border overflow-hidden">
-        <div className="p-4 border-b border-border">
+      <div>
+        <div>
           <h3 className="font-semibold text-foreground">
             All {results.length} item processed | Total: {(results.length * 1.6).toFixed(1)} MB
           </h3>
         </div>
-        <div className="divide-y divide-border max-h-[300px] overflow-auto">
+        <div className="max-h-[300px] overflow-auto">
           {results.map((result) => (
             <button
               key={result.id}
@@ -67,11 +67,11 @@ const ResultsPanel = ({ results }: ResultsPanelProps) => {
 
       {/* Detail View */}
       {currentResult && (
-        <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
             {/* Left: Image Preview */}
-            <div className="lg:border-r border-border p-6 flex flex-col items-center justify-center bg-secondary/30">
-              <div className="w-full aspect-square max-w-xs bg-secondary rounded-lg border border-border flex items-center justify-center mb-4">
+            <div className="p-0 flex flex-col items-center justify-center">
+              <div className="w-full aspect-square max-w-xs bg-secondary rounded-lg flex items-center justify-center mb-4">
                 <ImageIcon className="h-24 w-24 text-muted-foreground" />
               </div>
               <p className="text-xs text-muted-foreground text-center mb-2">
@@ -83,7 +83,7 @@ const ResultsPanel = ({ results }: ResultsPanelProps) => {
             </div>
 
             {/* Right: Metadata Details */}
-            <div className="lg:col-span-2 p-6 space-y-6">
+            <div className="lg:col-span-2 space-y-6">
               {/* Title */}
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -140,7 +140,7 @@ const ResultsPanel = ({ results }: ResultsPanelProps) => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
+              <div className="flex flex-wrap gap-3 pt-4">
                 <Button
                   variant="outline"
                   size="sm"
