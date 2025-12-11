@@ -72,13 +72,13 @@ const Index = () => {
   const [results, setResults] = useState<Result[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerate = async () => {
+  const handleGenerate = () => {
     if (files.length === 0) return;
     
     setIsGenerating(true);
     
     // Simulate generation (in real app, this would call AI API)
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       const newResults: Result[] = files.map((file, i) => ({
         id: `${Date.now()}-${i}`,
         filename: file.name,
@@ -89,6 +89,8 @@ const Index = () => {
       setResults(newResults);
       setIsGenerating(false);
     }, 2000);
+    
+    return () => clearTimeout(timer);
   };
 
   const handleExport = () => {

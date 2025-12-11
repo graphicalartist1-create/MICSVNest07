@@ -32,14 +32,14 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
     setIsDragging(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
     onFilesChange([...files, ...droppedFiles]);
-  }, [files, onFilesChange]);
+  }, [onFilesChange, files]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
       onFilesChange([...files, ...selectedFiles]);
     }
-  }, [files, onFilesChange]);
+  }, [onFilesChange, files]);
 
   const clearAll = () => {
     onFilesChange([]);
