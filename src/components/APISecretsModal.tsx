@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, Check, ExternalLink, Sparkles, Zap, Cpu, Route, Bolt } from "lucide-react";
+import { Copy, Check, ExternalLink, Sparkles, Zap, Cpu, Route, Bolt, Eye, EyeOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
   const [openrouterKey, setOpenrouterKey] = useState("");
   const [grokKey, setGrokKey] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
 
   const providers = [
     { id: "gemini", name: "Google Gemini", badge: "Paid & Free", color: "bg-cyan-500", icon: Sparkles },
@@ -57,6 +58,29 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
     navigator.clipboard.writeText(key);
     setCopiedKey(provider);
     setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const toggleKeyVisibility = (provider: string) => {
+    const newVisibleKeys = new Set(visibleKeys);
+    if (newVisibleKeys.has(provider)) {
+      newVisibleKeys.delete(provider);
+    } else {
+      newVisibleKeys.add(provider);
+    }
+    setVisibleKeys(newVisibleKeys);
+  };
+
+  const deleteKey = (provider: string) => {
+    switch (provider) {
+      case "gemini": setGeminiKey(""); break;
+      case "mistral": setMistralKey(""); break;
+      case "openai": setOpenaiKey(""); break;
+      case "openrouter": setOpenrouterKey(""); break;
+      case "groq": setGrokKey(""); break;
+    }
+    const newVisibleKeys = new Set(visibleKeys);
+    newVisibleKeys.delete(provider);
+    setVisibleKeys(newVisibleKeys);
   };
 
   const getProviderName = (provider: string) => {
@@ -208,33 +232,43 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
             ) : (
               <div className="space-y-3">
                 {storedKeys.map((item) => (
-                  <div key={item.provider} className="bg-background border border-border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-foreground">
-                        {getProviderName(item.provider)}
+                  <div key={item.provider} className="bg-background border border-cyan-500/30 rounded-lg p-4 flex items-center gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="text-sm font-medium text-foreground">
+                          {getProviderName(item.provider)}
+                        </p>
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span className="text-xs text-green-500 font-medium">Active</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        {visibleKeys.has(item.provider) ? item.key : item.key.substring(0, 20) + "..."}
                       </p>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(item.key, item.provider)}
-                        className="gap-2"
+                        size="icon"
+                        onClick={() => toggleKeyVisibility(item.provider)}
+                        title={visibleKeys.has(item.provider) ? "Hide key" : "Show key"}
+                        className="h-8 w-8"
                       >
-                        {copiedKey === item.provider ? (
-                          <>
-                            <Check className="h-4 w-4 text-green-500" />
-                            Copied
-                          </>
+                        {visibleKeys.has(item.provider) ? (
+                          <Eye className="h-4 w-4" />
                         ) : (
-                          <>
-                            <Copy className="h-4 w-4" />
-                            Copy
-                          </>
+                          <EyeOff className="h-4 w-4" />
                         )}
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteKey(item.provider)}
+                        title="Delete key"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground font-mono truncate">
-                      {item.key.substring(0, 20)}...
-                    </p>
                   </div>
                 ))}
               </div>
