@@ -1,4 +1,4 @@
-import { Calendar, MessageCircle, DollarSign } from "lucide-react";
+import { Calendar, MessageCircle, DollarSign, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -36,6 +36,15 @@ const Header = () => {
           </svg>
           Sign in with Google
         </Button>
+        <div className="flex items-center gap-3 bg-card border border-border rounded-lg px-4 py-2 ml-2">
+          <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
+            <User className="h-4 w-4 text-primary" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs text-muted-foreground">Developed By</span>
+            <span className="text-xs font-medium text-primary">Mazharul Islam</span>
+          </div>
+        </div>
       </nav>
     </header>
   );

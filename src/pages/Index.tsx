@@ -4,7 +4,6 @@ import GenerationControls from "@/components/GenerationControls";
 import FileUpload from "@/components/FileUpload";
 import ResultsPanel from "@/components/ResultsPanel";
 import HowToUseButton from "@/components/HowToUseButton";
-import DeveloperBadge from "@/components/DeveloperBadge";
 
 interface GenerationSettings {
   titleLength: number;
@@ -143,7 +142,6 @@ const Index = () => {
       </main>
 
       <HowToUseButton />
-      <DeveloperBadge />
     </div>
   );
 };
