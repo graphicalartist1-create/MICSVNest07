@@ -96,17 +96,17 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl bg-background border border-border p-1 text-sm overflow-hidden">
+      <DialogContent className="w-[95vw] bg-background border border-border p-2 text-sm overflow-hidden">
         <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-0">
           <DialogTitle className="text-sm font-bold text-foreground">API Secrets Management</DialogTitle>
         </DialogHeader>
 
-        <div className="text-[12px] text-muted-foreground mb-0">
+        <div className="text-[12px] text-muted-foreground mb-1">
           Manage your AI provider API keys. Keys are stored locally and securely.
         </div>
 
         {/* Provider Selection */}
-        <div className="mb-2 mt-1">
+        <div className="mb-2 mt-0">
           <h3 className="text-[12px] font-semibold text-foreground mb-1">Select AI Provider</h3>
           <div className="flex flex-wrap gap-2">
             {providers.map((provider) => {
@@ -115,7 +115,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                 <button
                   key={provider.id}
                   onClick={() => setSelectedProvider(provider.id as any)}
-                  className={`relative px-1.5 py-1 rounded-md border transition-all text-[12px] ${
+                  className={`relative px-3 py-1.5 rounded-lg border-2 transition-all text-[12px] ${
                     selectedProvider === provider.id
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-muted-foreground"
