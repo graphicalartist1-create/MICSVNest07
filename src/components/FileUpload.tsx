@@ -109,7 +109,7 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults
   };
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden h-full flex flex-col">
+    <div className="bg-card rounded-lg border border-border overflow-hidden flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-border">
         <h2 className="text-lg font-semibold text-foreground">Upload Files</h2>
@@ -130,13 +130,13 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults
       )}
 
       {/* Upload Area */}
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-4 overflow-y-auto">
         {files.length === 0 ? (
-          <div
+            <div
             onDragOver={isSignedIn ? handleDragOver : undefined}
             onDragLeave={isSignedIn ? handleDragLeave : undefined}
             onDrop={isSignedIn ? handleDrop : undefined}
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all h-full min-h-[300px] flex flex-col items-center justify-center ${
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all min-h-0 flex flex-col items-center justify-center ${
               !isSignedIn
                 ? "border-muted-foreground/30 bg-muted/30 opacity-50 cursor-not-allowed"
                 : isDragging
