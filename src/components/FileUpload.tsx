@@ -1,7 +1,12 @@
 import { useState, useCallback } from "react";
-import { Upload, Trash2, Sparkles, Download, LogIn, AlertCircle } from "lucide-react";
+import { Upload, Trash2, Sparkles, Download, LogIn, AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+interface FilePreview {
+  file: File;
+  preview: string;
+}
 
 interface FileUploadProps {
   files: File[];
@@ -16,6 +21,25 @@ const fileTypes = ["Images", "Videos", "SVG", "EPS"] as const;
 const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }: FileUploadProps) => {
   const [activeType, setActiveType] = useState<typeof fileTypes[number]>("Images");
   const [isDragging, setIsDragging] = useState(false);
+  const [filePreviews, setFilePreviews] = useState<FilePreview[]>([]);
+
+  const createPreviews = (newFiles: File[]) => {
+    newFiles.forEach((file) => {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setFilePreviews((prev) => [
+            ...prev,
+            {
+              file,
+              preview: e.target?.result as string,
+            },
+          ]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -31,18 +55,30 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
     e.preventDefault();
     setIsDragging(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
-    onFilesChange([...files, ...droppedFiles]);
+    const newFiles = [...files, ...droppedFiles];
+    onFilesChange(newFiles);
+    createPreviews(droppedFiles);
   }, [onFilesChange, files]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
-      onFilesChange([...files, ...selectedFiles]);
+      const newFiles = [...files, ...selectedFiles];
+      onFilesChange(newFiles);
+      createPreviews(selectedFiles);
     }
   }, [onFilesChange, files]);
 
+  const removeFile = (index: number) => {
+    const updatedFiles = files.filter((_, i) => i !== index);
+    const updatedPreviews = filePreviews.filter((_, i) => i !== index);
+    onFilesChange(updatedFiles);
+    setFilePreviews(updatedPreviews);
+  };
+
   const clearAll = () => {
     onFilesChange([]);
+    setFilePreviews([]);
   };
 
   return (
@@ -65,57 +101,109 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
       </div>
 
       {/* Upload Area */}
-      <div className="p-4 flex-1">
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-all h-full min-h-[300px] flex flex-col items-center justify-center ${
-            isDragging
-              ? "border-primary bg-primary/5"
-              : "border-border hover:border-muted-foreground"
-          }`}
-        >
-          <Upload className="h-12 w-12 text-muted-foreground mb-4" />
-          
-          {/* File Type Tabs */}
-          <div className="flex gap-2 mb-4">
-            {fileTypes.map((type) => (
-              <button
-                key={type}
-                onClick={() => setActiveType(type)}
-                className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                  activeType === type
-                    ? "bg-primary/20 text-primary border border-primary/50"
-                    : "bg-secondary text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
+      <div className="p-4 flex-1 overflow-y-auto">
+        {files.length === 0 ? (
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all h-full min-h-[300px] flex flex-col items-center justify-center ${
+              isDragging
+                ? "border-primary bg-primary/5"
+                : "border-border hover:border-muted-foreground"
+            }`}
+          >
+            <Upload className="h-12 w-12 text-muted-foreground mb-4" />
+            
+            {/* File Type Tabs */}
+            <div className="flex gap-2 mb-4">
+              {fileTypes.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setActiveType(type)}
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                    activeType === type
+                      ? "bg-primary/20 text-primary border border-primary/50"
+                      : "bg-secondary text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-foreground mb-2">
+              Drag & drop files here, or click to select
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Supports common image, video, SVG, and EPS formats. Max 500 files.
+            </p>
+
+            <input
+              type="file"
+              multiple
+              accept="image/*,video/*,.svg,.eps"
+              onChange={handleFileSelect}
+              className="hidden"
+              id="file-upload"
+            />
+            <label htmlFor="file-upload">
+              <Button variant="outline" asChild className="cursor-pointer">
+                <span>Select Files</span>
+              </Button>
+            </label>
           </div>
+        ) : (
+          <div>
+            <h3 className="text-sm font-medium text-foreground mb-4">
+              Uploaded Files ({files.length})
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+              {filePreviews.map((item, index) => (
+                <div key={index} className="relative group">
+                  <div className="relative w-full aspect-square bg-secondary rounded-lg overflow-hidden border border-border">
+                    {item.preview && (
+                      <img
+                        src={item.preview}
+                        alt={item.file.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                  <button
+                    onClick={() => removeFile(index)}
+                    className="absolute top-2 right-2 p-1 bg-destructive/90 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-4 w-4 text-destructive-foreground" />
+                  </button>
+                  <p className="text-xs text-muted-foreground mt-2 truncate">
+                    {item.file.name}
+                  </p>
+                </div>
+              ))}
+            </div>
 
-          <p className="text-foreground mb-2">
-            Drag & drop files here, or click to select
-          </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            Supports common image, video, SVG, and EPS formats. Max 500 files.
-          </p>
-
-          <input
-            type="file"
-            multiple
-            accept="image/*,video/*,.svg,.eps"
-            onChange={handleFileSelect}
-            className="hidden"
-            id="file-upload"
-          />
-          <label htmlFor="file-upload">
-            <Button variant="outline" asChild className="cursor-pointer">
-              <span>Select Files</span>
-            </Button>
-          </label>
-        </div>
+            {/* Add More Files */}
+            <div className="pt-4 border-t border-border">
+              <input
+                type="file"
+                multiple
+                accept="image/*,video/*,.svg,.eps"
+                onChange={handleFileSelect}
+                className="hidden"
+                id="file-upload-more"
+              />
+              <label htmlFor="file-upload-more">
+                <Button variant="outline" asChild className="cursor-pointer gap-2 w-full">
+                  <span>
+                    <Upload className="h-4 w-4" />
+                    Add More Files
+                  </span>
+                </Button>
+              </label>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* API Warning */}
