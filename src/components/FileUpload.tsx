@@ -136,18 +136,18 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults
             onDragOver={isSignedIn ? handleDragOver : undefined}
             onDragLeave={isSignedIn ? handleDragLeave : undefined}
             onDrop={isSignedIn ? handleDrop : undefined}
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all min-h-0 flex flex-col items-center justify-center ${
+            className={`border-2 border-dashed rounded-lg p-4 text-center transition-all min-h-0 flex flex-col items-center justify-center ${
               !isSignedIn
-                ? "border-muted-foreground/30 bg-muted/30 opacity-50 cursor-not-allowed"
+                ? "border-muted-foreground/30 cursor-not-allowed"
                 : isDragging
                 ? "border-primary bg-primary/5"
                 : "border-border hover:border-muted-foreground"
             }`}
           >
-            <Upload className="h-12 w-12 text-muted-foreground mb-4" />
+            <Upload className="h-8 w-8 text-muted-foreground mb-3" />
             
             {/* File Type Tabs */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-3">
               {fileTypes.map((type) => (
                 <button
                   key={type}
@@ -163,10 +163,10 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults
               ))}
             </div>
 
-            <p className="text-foreground mb-2">
+            <p className="text-foreground mb-1 text-sm">
               Drag & drop files here, or click to select
             </p>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-xs text-foreground/70 mb-3">
               Supports common image, video, SVG, and EPS formats. Max 500 files.
             </p>
 
