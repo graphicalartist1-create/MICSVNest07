@@ -35,6 +35,7 @@ interface GenerationControlsProps {
     negativePromptWordsText: string;
   };
   onSettingsChange: (settings: any) => void;
+  onOpenAPISecrets?: () => void;
 }
 
 const platforms = [
@@ -83,7 +84,7 @@ const PlatformIcon = ({ icon }: { icon: string }) => {
   }
 };
 
-const GenerationControls = ({ settings, onSettingsChange }: GenerationControlsProps) => {
+const GenerationControls = ({ settings, onSettingsChange, onOpenAPISecrets }: GenerationControlsProps) => {
   const [activeTab, setActiveTab] = useState<"metadata" | "prompt">("metadata");
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(true);
 
@@ -99,7 +100,7 @@ const GenerationControls = ({ settings, onSettingsChange }: GenerationControlsPr
           <Settings className="h-5 w-5 text-primary" />
           <span className="font-medium text-foreground">Generation Controls</span>
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={onOpenAPISecrets}>
           <Key className="h-4 w-4" />
           API Secrets
         </Button>
