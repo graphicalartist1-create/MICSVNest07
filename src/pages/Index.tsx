@@ -191,7 +191,7 @@ const Index = () => {
       <Header />
       
       <main className="p-6 pb-0">
-        <div className="flex gap-6 max-w-[1800px] mx-auto">
+        <div className="flex items-start gap-6 max-w-[1800px] mx-auto">
           {/* Left Sidebar - Generation Controls */}
           <aside className="w-[480px] flex-shrink-0">
             <GenerationControls settings={settings} onSettingsChange={setSettings} />
