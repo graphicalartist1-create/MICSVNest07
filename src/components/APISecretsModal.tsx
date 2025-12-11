@@ -249,6 +249,19 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                       <Button
                         variant="ghost"
                         size="icon"
+                        onClick={() => copyToClipboard(item.key, item.provider)}
+                        title="Copy key"
+                        className="h-8 w-8"
+                      >
+                        {copiedKey === item.provider ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => toggleKeyVisibility(item.provider)}
                         title={visibleKeys.has(item.provider) ? "Hide key" : "Show key"}
                         className="h-8 w-8"
