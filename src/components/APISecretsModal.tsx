@@ -121,8 +121,8 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                       : "border-border hover:border-muted-foreground"
                   }`}
                 >
-                  <div className="flex items-center gap-1">
-                    <IconComponent className="w-3 h-3" />
+                  <div className="flex items-center gap-1 whitespace-nowrap">
+                    <IconComponent className="w-3 h-3 flex-shrink-0" />
                     <span className="text-[12px] font-medium text-foreground">{provider.name}</span>
                   </div>
                   <span className={`absolute -top-4 right-1 px-1 py-0.5 rounded-full text-[11px] font-semibold text-white ${provider.color}`}>
