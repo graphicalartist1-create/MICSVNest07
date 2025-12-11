@@ -2,6 +2,7 @@ import { Calendar, MessageCircle, DollarSign, User, LogOut, Shield } from "lucid
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import APISecretsModal from "@/components/APISecretsModal";
 
 interface UserProfile {
   name: string;
@@ -18,6 +19,7 @@ declare global {
 const Header = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiSecretsOpen, setApiSecretsOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -143,6 +145,16 @@ const Header = () => {
           variant="outline" 
           size="sm" 
           className="gap-2"
+          onClick={() => setApiSecretsOpen(true)}
+          title="API Secrets"
+        >
+          <DollarSign className="h-4 w-4" />
+          API Secrets
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2"
           onClick={() => navigate("/admin")}
           title="Admin Panel"
         >
@@ -202,6 +214,8 @@ const Header = () => {
         )}
       </nav>
       <div id="google-signin-button" style={{ display: "none" }}></div>
+
+      <APISecretsModal open={apiSecretsOpen} onOpenChange={setApiSecretsOpen} />
     </header>
   );
 };
