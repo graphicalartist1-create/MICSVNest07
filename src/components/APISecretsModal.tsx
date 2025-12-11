@@ -107,7 +107,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                     <IconComponent className="w-4 h-4" />
                     <span className="text-sm font-medium text-foreground">{provider.name}</span>
                   </div>
-                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white ${provider.color}`}>
+                  <span className={`absolute -top-2 right-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white ${provider.color}`}>
                     {provider.badge}
                   </span>
                 </button>
