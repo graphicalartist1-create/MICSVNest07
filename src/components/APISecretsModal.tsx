@@ -96,18 +96,18 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl bg-background border border-border p-1 text-sm overflow-hidden">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-0">
-          <DialogTitle className="text-sm font-bold text-foreground">API Secrets Management</DialogTitle>
+      <DialogContent className="max-w-4xl bg-background border border-border p-4 text-sm overflow-hidden">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-2">
+          <DialogTitle className="text-lg font-bold text-foreground">API Secrets Management</DialogTitle>
         </DialogHeader>
 
-        <div className="text-[12px] text-muted-foreground mb-0">
+        <div className="text-sm text-muted-foreground mb-3">
           Manage your AI provider API keys. Keys are stored locally and securely.
         </div>
 
         {/* Provider Selection */}
-        <div className="mb-2 mt-1">
-          <h3 className="text-[12px] font-semibold text-foreground mb-1">Select AI Provider</h3>
+        <div className="mb-3 mt-2">
+          <h3 className="text-sm font-semibold text-foreground mb-2">Select AI Provider</h3>
           <div className="flex flex-wrap gap-2">
             {providers.map((provider) => {
               const IconComponent = provider.icon;
@@ -115,7 +115,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                 <button
                   key={provider.id}
                   onClick={() => setSelectedProvider(provider.id as any)}
-                  className={`relative px-1.5 py-1 rounded-md border transition-all text-[12px] ${
+                  className={`relative px-3 py-1.5 rounded-md border transition-all text-sm ${
                     selectedProvider === provider.id
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-muted-foreground"
@@ -123,7 +123,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                 >
                   <div className="flex items-center gap-1">
                     <IconComponent className="w-3 h-3" />
-                    <span className="text-[12px] font-medium text-foreground">{provider.name}</span>
+                    <span className="text-sm font-medium text-foreground">{provider.name}</span>
                   </div>
                   <span className={`absolute -top-4 right-1 px-1 py-0.5 rounded-full text-[11px] font-semibold text-white ${provider.color}`}>
                     {provider.badge}
@@ -134,13 +134,13 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">
           {/* Left: Configuration */}
-          <div className="border border-border rounded-lg p-1 bg-secondary/30">
-            <h3 className="text-[13px] font-semibold text-foreground mb-0">
+          <div className="border border-border rounded-lg p-3 bg-secondary/30">
+            <h3 className="text-sm font-semibold text-foreground mb-2">
               {currentProvider?.name} Configuration
             </h3>
-            <p className="text-[12px] text-muted-foreground mb-1">
+            <p className="text-sm text-muted-foreground mb-2">
               {selectedProvider === "gemini" && "Google's advanced AI model for text and image analysis"}
               {selectedProvider === "mistral" && "Mistral AI's powerful language models"}
               {selectedProvider === "openai" && "OpenAI's GPT models for advanced AI tasks"}
@@ -148,7 +148,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
               {selectedProvider === "groq" && "Fast inference with Groq's LPU technology"}
             </p>
 
-            <label className="text-[12px] font-medium text-foreground mb-1 block">Select Model</label>
+            <label className="text-sm font-medium text-foreground mb-2 block">Select Model</label>
             {selectedProvider === "gemini" && (
               <>
                 <Select defaultValue="gemini-2.5-flash-lite">
@@ -220,7 +220,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
             {selectedProvider === "groq" && (
               <>
                 <Select defaultValue="llama-4-scout">
-                  <SelectTrigger className="bg-background border border-border mb-6">
+                  <SelectTrigger className="bg-background border border-border mb-2 h-8">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -229,16 +229,16 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                     <SelectItem value="mixtral-8x7b">Mixtral 8x7B</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="bg-primary/10 border border-primary/30 rounded p-2 mb-6">
-                  <p className="text-xs text-primary">ℹ️ This model supports image analysis</p>
+                <div className="bg-primary/10 border border-primary/30 rounded p-1 mb-2">
+                  <p className="text-sm text-primary">ℹ️ This model supports image analysis</p>
                 </div>
               </>
             )}
 
-            <label className="text-[12px] font-medium text-foreground mb-0 block">
+            <label className="text-sm font-medium text-foreground mb-1 block">
               {selectedProvider === "gemini" ? "Google Gemini API Keys" : `${currentProvider?.name} API Keys`}
             </label>
-            <p className="text-[12px] text-muted-foreground mb-0">
+            <p className="text-sm text-muted-foreground mb-1">
               {selectedProvider === "gemini" && 'Gemini API keys should start with "Alza"'}
               {selectedProvider !== "gemini" && `Enter your ${currentProvider?.name} API key`}
             </p>
@@ -271,7 +271,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 hover:text-cyan-300 text-sm mt-1 flex items-center gap-1"
+              className="text-cyan-400 hover:text-cyan-300 text-sm mt-2 flex items-center gap-1"
             >
               Get {currentProvider?.name} API Key
               <ExternalLink className="h-3 w-3" />
@@ -279,11 +279,11 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
 
           {/* Right: Stored Keys */}
-          <div className="border border-border rounded-lg p-1 bg-secondary/30">
-            <h3 className="text-[13px] font-semibold text-foreground mb-1">
-              Stored Keys <span className="text-[12px] text-muted-foreground font-normal">({storedKeys.length})</span>
+          <div className="border border-border rounded-lg p-3 bg-secondary/30">
+            <h3 className="text-sm font-semibold text-foreground mb-1">
+              Stored Keys <span className="text-sm text-muted-foreground font-normal">({storedKeys.length})</span>
             </h3>
-            <p className="text-[12px] text-muted-foreground mb-0">
+            <p className="text-sm text-muted-foreground mb-2">
               Manage your stored API keys for {currentProvider?.name}
             </p>
 
@@ -293,7 +293,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                   <span className="text-lg">ℹ️</span>
                 </div>
                 <p className="text-muted-foreground mb-1">No API keys stored yet.</p>
-                <p className="text-[12px] text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Add a key using the form on the left.
                 </p>
               </div>
@@ -303,13 +303,13 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                   <div key={item.provider} className="bg-background border border-cyan-500/30 rounded-lg p-2 flex items-center gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-0">
-                        <p className="text-[13px] font-medium text-foreground">
+                        <p className="text-sm font-medium text-foreground">
                           {getProviderName(item.provider)}
                         </p>
                         <Check className="h-4 w-4 text-green-500" />
-                        <span className="text-[11px] text-green-500 font-medium">Active</span>
+                        <span className="text-[12px] text-green-500 font-medium">Active</span>
                       </div>
-                      <p className="text-[12px] text-muted-foreground font-mono">
+                      <p className="text-sm text-muted-foreground font-mono">
                         {visibleKeys.has(item.provider) ? item.key : item.key.substring(0, 20) + "..."}
                       </p>
                     </div>
@@ -358,7 +358,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         </div>
 
         {/* Close Button */}
-        <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-border">
+        <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-border">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
