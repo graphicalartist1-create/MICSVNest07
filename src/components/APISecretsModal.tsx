@@ -96,8 +96,8 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-screen bg-background border border-border p-6">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-4">
+      <DialogContent className="max-w-3xl max-h-[80vh] bg-background border border-border p-4">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-3">
           <DialogTitle className="text-2xl font-bold text-foreground">API Secrets Management</DialogTitle>
         </DialogHeader>
 
