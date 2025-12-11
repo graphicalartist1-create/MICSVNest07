@@ -14,13 +14,14 @@ interface FileUploadProps {
   onGenerate: () => void;
   onExport: () => void;
   onClearResults?: () => void;
+  onOpenAPISecrets?: () => void;
   isGenerating: boolean;
   isSignedIn?: boolean;
 }
 
 const fileTypes = ["Images", "Videos", "SVG", "EPS"] as const;
 
-const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults, isGenerating, isSignedIn = false }: FileUploadProps) => {
+const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults, onOpenAPISecrets, isGenerating, isSignedIn = false }: FileUploadProps) => {
   const [activeType, setActiveType] = useState<typeof fileTypes[number]>("Images");
   const [isDragging, setIsDragging] = useState(false);
   const [filePreviews, setFilePreviews] = useState<FilePreview[]>([]);
@@ -321,7 +322,15 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults
       <div className="px-4 pb-4">
         <div className="flex items-center gap-2 text-destructive text-sm">
           <AlertCircle className="h-4 w-4" />
-          <span>No Google Gemini API keys. Add keys in settings.</span>
+          <span>No Google Gemini API keys.</span>
+          <Button 
+            variant="link" 
+            size="sm" 
+            className="p-0 h-auto text-destructive hover:text-destructive/80"
+            onClick={onOpenAPISecrets}
+          >
+            Add keys in API Secrets
+          </Button>
         </div>
       </div>
 

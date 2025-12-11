@@ -29,6 +29,9 @@ const ADMIN_CREDENTIALS = {
   password: "Admin@12345", // Should be hashed in production
 };
 
+// Admin email - শুধুমাত্র এই ইমেইল দিয়ে সাইন ইন করলে Admin দেখা যাবে
+const ADMIN_EMAIL = "islammazharul2382008@gmail.com"; // আপনার জিমেইল
+
 export const verifyAdminLogin = (username: string, password: string): boolean => {
   return (
     username === ADMIN_CREDENTIALS.username &&
@@ -91,6 +94,11 @@ export const updateUsageStats = (updates: Partial<UsageStats>) => {
 
 export const isAdminLoggedIn = (): boolean => {
   return !!localStorage.getItem("adminToken");
+};
+
+export const isAdminUser = (email: string | null | undefined): boolean => {
+  if (!email) return false;
+  return email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 };
 
 export const setAdminLoggedIn = (logged: boolean) => {

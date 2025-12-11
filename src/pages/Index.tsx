@@ -5,6 +5,7 @@ import FileUpload from "@/components/FileUpload";
 import ResultsPanel from "@/components/ResultsPanel";
 import GenerationProgress from "@/components/GenerationProgress";
 import HowToUseButton from "@/components/HowToUseButton";
+import APISecretsModal from "@/components/APISecretsModal";
 
 interface GenerationSettings {
   titleLength: number;
@@ -77,6 +78,7 @@ const Index = () => {
   const [currentFile, setCurrentFile] = useState("");
   const [processedFiles, setProcessedFiles] = useState(0);
   const [generationTimer, setGenerationTimer] = useState<NodeJS.Timeout | null>(null);
+  const [apiSecretsOpen, setApiSecretsOpen] = useState(false);
 
   useEffect(() => {
     // Check if user is signed in
@@ -205,6 +207,7 @@ const Index = () => {
               onGenerate={handleGenerate}
               onExport={handleExport}
               onClearResults={handleClearResults}
+              onOpenAPISecrets={() => setApiSecretsOpen(true)}
               isGenerating={isGenerating}
               isSignedIn={isSignedIn}
             />
@@ -225,6 +228,8 @@ const Index = () => {
         processedFiles={processedFiles}
         onCancel={handleCancelGeneration}
       />
+
+      <APISecretsModal open={apiSecretsOpen} onOpenChange={setApiSecretsOpen} />
     </div>
   );
 };

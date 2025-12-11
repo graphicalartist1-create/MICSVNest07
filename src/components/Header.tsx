@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import APISecretsModal from "@/components/APISecretsModal";
+import { isAdminUser } from "@/lib/adminAuth";
 
 interface UserProfile {
   name: string;
@@ -133,34 +134,18 @@ const Header = () => {
           <Calendar className="h-4 w-4" />
           Event Calendar
         </Button>
-        <Button variant="outline" size="sm" className="gap-2">
-          <MessageCircle className="h-4 w-4" />
-          Join Discord
-        </Button>
-        <Button variant="outline" size="sm" className="gap-2">
-          <DollarSign className="h-4 w-4" />
-          Pricing
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2"
-          onClick={() => setApiSecretsOpen(true)}
-          title="API Secrets"
-        >
-          <DollarSign className="h-4 w-4" />
-          API Secrets
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2"
-          onClick={() => navigate("/admin")}
-          title="Admin Panel"
-        >
-          <Shield className="h-4 w-4" />
-          Admin
-        </Button>
+        {isAdminUser(user?.email) && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => navigate("/admin")}
+            title="Admin Panel"
+          >
+            <Shield className="h-4 w-4" />
+            Admin
+          </Button>
+        )}
 
         {/* User Profile or Sign In Button */}
         {user ? (
