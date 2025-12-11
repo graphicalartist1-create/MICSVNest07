@@ -97,8 +97,8 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] bg-background border border-border p-3 overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-2">
-          <DialogTitle className="text-xl font-bold text-foreground">API Secrets Management</DialogTitle>
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-1.5">
+          <DialogTitle className="text-lg font-bold text-foreground">API Secrets Management</DialogTitle>
         </DialogHeader>
 
         <div className="text-xs text-muted-foreground mb-2">
@@ -106,16 +106,16 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         </div>
 
         {/* Provider Selection */}
-        <div className="mb-3">
-          <h3 className="text-xs font-semibold text-foreground mb-2">Select AI Provider</h3>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-2.5">
+          <h3 className="text-xs font-semibold text-foreground mb-1.5">Select AI Provider</h3>
+          <div className="flex flex-wrap gap-1.5">
             {providers.map((provider) => {
               const IconComponent = provider.icon;
               return (
                 <button
                   key={provider.id}
                   onClick={() => setSelectedProvider(provider.id as any)}
-                  className={`relative px-3 py-2 rounded-lg border-2 transition-all text-xs ${
+                  className={`relative px-2.5 py-1.5 rounded-lg border-2 transition-all text-xs ${
                     selectedProvider === provider.id
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-muted-foreground"
@@ -134,13 +134,13 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 mt-2.5">
           {/* Left: Configuration */
-          <div className="border border-border rounded-lg p-3 bg-secondary/30">
+          <div className="border border-border rounded-lg p-2.5 bg-secondary/30">
             <h3 className="text-sm font-semibold text-foreground mb-1">
               {currentProvider?.name} Configuration
             </h3>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-xs text-muted-foreground mb-2">
               {selectedProvider === "gemini" && "Google's advanced AI model for text and image analysis"}
               {selectedProvider === "mistral" && "Mistral AI's powerful language models"}
               {selectedProvider === "openai" && "OpenAI's GPT models for advanced AI tasks"}
@@ -279,11 +279,11 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
 
           {/* Right: Stored Keys */}
-          <div className="border border-border rounded-lg p-3 bg-secondary/30">
+          <div className="border border-border rounded-lg p-2.5 bg-secondary/30">
             <h3 className="text-sm font-semibold text-foreground mb-1">
               Stored Keys <span className="text-xs text-muted-foreground font-normal">({storedKeys.length})</span>
             </h3>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-xs text-muted-foreground mb-2">
               Manage your stored API keys for {currentProvider?.name}
             </p>
 
@@ -358,7 +358,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         </div>
 
         {/* Close Button */}
-        <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-border">
+        <div className="flex justify-end gap-2 mt-2.5 pt-1.5 border-t border-border">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
