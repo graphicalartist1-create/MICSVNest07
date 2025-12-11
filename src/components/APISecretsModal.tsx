@@ -148,9 +148,9 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
               {selectedProvider === "groq" && "Fast inference with Groq's LPU technology"}
             </p>
 
+            <label className="text-sm font-medium text-foreground mb-3 block">Select Model</label>
             {selectedProvider === "gemini" && (
               <>
-                <label className="text-sm font-medium text-foreground mb-3 block">Select Model</label>
                 <Select defaultValue="gemini-2.5-flash-lite">
                   <SelectTrigger className="bg-background border border-border mb-6">
                     <SelectValue />
@@ -159,6 +159,74 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
                     <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite Preview</SelectItem>
                     <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash</SelectItem>
                     <SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="bg-primary/10 border border-primary/30 rounded p-2 mb-6">
+                  <p className="text-xs text-primary">ℹ️ This model supports image analysis</p>
+                </div>
+              </>
+            )}
+            {selectedProvider === "mistral" && (
+              <>
+                <Select defaultValue="mistral-small">
+                  <SelectTrigger className="bg-background border border-border mb-6">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mistral-small">Mistral Small (Latest)</SelectItem>
+                    <SelectItem value="mistral-medium">Mistral Medium</SelectItem>
+                    <SelectItem value="mistral-large">Mistral Large</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="bg-primary/10 border border-primary/30 rounded p-2 mb-6">
+                  <p className="text-xs text-primary">ℹ️ This model supports image analysis</p>
+                </div>
+              </>
+            )}
+            {selectedProvider === "openai" && (
+              <>
+                <Select defaultValue="gpt-4o">
+                  <SelectTrigger className="bg-background border border-border mb-6">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                    <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="bg-primary/10 border border-primary/30 rounded p-2 mb-6">
+                  <p className="text-xs text-primary">ℹ️ This model supports image analysis</p>
+                </div>
+              </>
+            )}
+            {selectedProvider === "openrouter" && (
+              <>
+                <Select defaultValue="gpt-4.1-nano">
+                  <SelectTrigger className="bg-background border border-border mb-6">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-4.1-nano">GPT-4.1 Nano</SelectItem>
+                    <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                    <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="bg-primary/10 border border-primary/30 rounded p-2 mb-6">
+                  <p className="text-xs text-primary">ℹ️ This model supports image analysis</p>
+                </div>
+              </>
+            )}
+            {selectedProvider === "groq" && (
+              <>
+                <Select defaultValue="llama-4-scout">
+                  <SelectTrigger className="bg-background border border-border mb-6">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="llama-4-scout">Llama 4 Scout</SelectItem>
+                    <SelectItem value="llama-3-70b">Llama 3 70B</SelectItem>
+                    <SelectItem value="mixtral-8x7b">Mixtral 8x7B</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="bg-primary/10 border border-primary/30 rounded p-2 mb-6">
