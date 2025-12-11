@@ -232,11 +232,12 @@ const GenerationControls = ({ settings, onSettingsChange }: GenerationControlsPr
                     <SelectValue placeholder="None" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="photo">Photo</SelectItem>
-                    <SelectItem value="vector">Vector</SelectItem>
-                    <SelectItem value="illustration">Illustration</SelectItem>
-                  </SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="illustration">Illustrations</SelectItem>
+                      <SelectItem value="3d-illustration">3D Illustrations</SelectItem>
+                      <SelectItem value="3d-icon">3D Icon</SelectItem>
+                      <SelectItem value="vector">Vector</SelectItem>
+                    </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-2">
                   If you upload preview file then choose image type vector then it will generate CSV in (EPS, SVG, AI).
@@ -352,9 +353,10 @@ const GenerationControls = ({ settings, onSettingsChange }: GenerationControlsPr
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="photo">Photo</SelectItem>
+                    <SelectItem value="illustration">Illustrations</SelectItem>
+                    <SelectItem value="3d-illustration">3D Illustrations</SelectItem>
+                    <SelectItem value="3d-icon">3D Icon</SelectItem>
                     <SelectItem value="vector">Vector</SelectItem>
-                    <SelectItem value="illustration">Illustration</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

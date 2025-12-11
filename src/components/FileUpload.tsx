@@ -13,16 +13,19 @@ interface FileUploadProps {
   onFilesChange: (files: File[]) => void;
   onGenerate: () => void;
   onExport: () => void;
+  onClearResults?: () => void;
   isGenerating: boolean;
+  isSignedIn?: boolean;
 }
 
 const fileTypes = ["Images", "Videos", "SVG", "EPS"] as const;
 
-const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }: FileUploadProps) => {
+const FileUpload = ({ files, onFilesChange, onGenerate, onExport, onClearResults, isGenerating, isSignedIn = false }: FileUploadProps) => {
   const [activeType, setActiveType] = useState<typeof fileTypes[number]>("Images");
   const [isDragging, setIsDragging] = useState(false);
   const [filePreviews, setFilePreviews] = useState<FilePreview[]>([]);
 
+  // Create image previews
   const createPreviews = (newFiles: File[]) => {
     newFiles.forEach((file) => {
       if (file.type.startsWith("image/")) {
@@ -41,6 +44,27 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
     });
   };
 
+  // Image previews removed per user request. We keep only file list state via props.
+
+  // Function to detect duplicate file names
+  const getDuplicateFiles = () => {
+    const fileNames = files.map(f => f.name);
+    const duplicates = new Set<string>();
+    const seen = new Set<string>();
+
+    fileNames.forEach(name => {
+      if (seen.has(name)) {
+        duplicates.add(name);
+      }
+      seen.add(name);
+    });
+
+    return Array.from(duplicates);
+  };
+
+  const duplicates = getDuplicateFiles();
+  const hasDuplicates = duplicates.length > 0;
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -54,20 +78,20 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    if (!isSignedIn) return;
     const droppedFiles = Array.from(e.dataTransfer.files);
     const newFiles = [...files, ...droppedFiles];
     onFilesChange(newFiles);
     createPreviews(droppedFiles);
-  }, [onFilesChange, files]);
+  }, [onFilesChange, files, isSignedIn]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const selectedFiles = Array.from(e.target.files);
-      const newFiles = [...files, ...selectedFiles];
-      onFilesChange(newFiles);
-      createPreviews(selectedFiles);
-    }
-  }, [onFilesChange, files]);
+    if (!isSignedIn || !e.target.files) return;
+    const selectedFiles = Array.from(e.target.files);
+    const newFiles = [...files, ...selectedFiles];
+    onFilesChange(newFiles);
+    createPreviews(selectedFiles);
+  }, [onFilesChange, files, isSignedIn]);
 
   const removeFile = (index: number) => {
     const updatedFiles = files.filter((_, i) => i !== index);
@@ -79,6 +103,9 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
   const clearAll = () => {
     onFilesChange([]);
     setFilePreviews([]);
+    if (onClearResults) {
+      onClearResults();
+    }
   };
 
   return (
@@ -89,26 +116,30 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
       </div>
 
       {/* Sign In Alert */}
-      <div className="px-4 pt-4">
-        <Alert className="bg-primary/10 border-primary/30">
-          <LogIn className="h-4 w-4 text-primary" />
-          <AlertDescription className="text-primary">
-            <span className="font-medium">Sign In Required</span>
-            <br />
-            <span className="text-sm opacity-80">Please sign in to upload files and use generation features.</span>
-          </AlertDescription>
-        </Alert>
-      </div>
+      {!isSignedIn && (
+        <div className="px-4 pt-4">
+          <Alert className="bg-primary/10 border-primary/30">
+            <LogIn className="h-4 w-4 text-primary" />
+            <AlertDescription className="text-primary">
+              <span className="font-medium">Sign In Required</span>
+              <br />
+              <span className="text-sm opacity-80">Please sign in with Google to upload files and use generation features.</span>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
 
       {/* Upload Area */}
       <div className="p-4 flex-1 overflow-y-auto">
         {files.length === 0 ? (
           <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            onDragOver={isSignedIn ? handleDragOver : undefined}
+            onDragLeave={isSignedIn ? handleDragLeave : undefined}
+            onDrop={isSignedIn ? handleDrop : undefined}
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-all h-full min-h-[300px] flex flex-col items-center justify-center ${
-              isDragging
+              !isSignedIn
+                ? "border-muted-foreground/30 bg-muted/30 opacity-50 cursor-not-allowed"
+                : isDragging
                 ? "border-primary bg-primary/5"
                 : "border-border hover:border-muted-foreground"
             }`}
@@ -158,10 +189,33 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
             <h3 className="text-sm font-medium text-foreground mb-4">
               Uploaded Files ({files.length})
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+
+            {/* File Summary Bar */}
+            <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 mb-4">
+              <p className="text-sm text-primary">
+                <span className="font-medium">{files.length} file(s)</span> ready for metadata | Total: <span className="font-medium">{(files.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024)).toFixed(1)} MB</span>
+              </p>
+            </div>
+
+            {/* Duplicate Warning */}
+            {hasDuplicates && (
+              <Alert className="mb-4 bg-destructive/10 border-destructive/30">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <AlertDescription className="text-destructive">
+                  <span className="font-medium">Duplicate Files Found!</span>
+                  <br />
+                  <span className="text-sm opacity-90">
+                    The following filenames appear more than once: <strong>{duplicates.join(", ")}</strong>
+                  </span>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* File Previews Gallery */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
               {filePreviews.map((item, index) => (
-                <div key={index} className="relative group">
-                  <div className="relative w-full aspect-square bg-secondary rounded-lg overflow-hidden border border-border">
+                <div key={`${item.file.name}-${index}`} className="relative group">
+                  <div className="relative w-full aspect-square bg-secondary rounded-lg overflow-hidden border border-border hover:border-primary transition-colors">
                     {item.preview && (
                       <img
                         src={item.preview}
@@ -172,13 +226,70 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
                   </div>
                   <button
                     onClick={() => removeFile(index)}
+                    className="absolute top-1 right-1 p-1.5 bg-destructive/90 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    title="Remove file"
+                  >
+                    <X className="h-4 w-4 text-destructive-foreground" />
+                  </button>
+                  <p className="text-xs text-muted-foreground mt-2 truncate" title={item.file.name}>
+                    {item.file.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(item.file.size / 1024).toFixed(0)} KB
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Add More Files */}
+            {filePreviews.length > 0 && (
+              <div className="pt-4 border-t border-border">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,video/*,.svg,.eps"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="file-upload-more"
+                />
+                <label htmlFor="file-upload-more">
+                  <Button variant="outline" asChild className="cursor-pointer gap-2 w-full">
+                    <span>
+                      <Upload className="h-4 w-4" />
+                      Add More Files
+                    </span>
+                  </Button>
+                </label>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Old Grid Layout - keeping as fallback */}
+        {files.length > 0 && filePreviews.length === 0 && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+              {files.map((file, index) => (
+                <div key={`${file.name}-${index}`} className="relative group">
+                  <div className={`relative w-full min-h-[64px] bg-secondary rounded-lg overflow-hidden border-2 flex items-center justify-between px-3 py-2 transition-colors ${
+                    duplicates.includes(file.name)
+                      ? "border-destructive/50 bg-destructive/5"
+                      : "border-border"
+                  }`}>
+                    <div className="flex-1">
+                      <div className="text-sm text-foreground break-words">{file.name}</div>
+                      {duplicates.includes(file.name) && (
+                        <div className="text-xs text-destructive mt-1 font-medium">🔔 Duplicate</div>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground ml-2">{(file.size / 1024).toFixed(0)} KB</div>
+                  </div>
+                  <button
+                    onClick={() => removeFile(index)}
                     className="absolute top-2 right-2 p-1 bg-destructive/90 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="h-4 w-4 text-destructive-foreground" />
                   </button>
-                  <p className="text-xs text-muted-foreground mt-2 truncate">
-                    {item.file.name}
-                  </p>
                 </div>
               ))}
             </div>
@@ -191,9 +302,9 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
                 accept="image/*,video/*,.svg,.eps"
                 onChange={handleFileSelect}
                 className="hidden"
-                id="file-upload-more"
+                id="file-upload-more-fallback"
               />
-              <label htmlFor="file-upload-more">
+              <label htmlFor="file-upload-more-fallback">
                 <Button variant="outline" asChild className="cursor-pointer gap-2 w-full">
                   <span>
                     <Upload className="h-4 w-4" />
@@ -202,7 +313,7 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
                 </Button>
               </label>
             </div>
-          </div>
+          </>
         )}
       </div>
 
@@ -232,7 +343,7 @@ const FileUpload = ({ files, onFilesChange, onGenerate, onExport, isGenerating }
             className="gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
           >
             <Sparkles className="h-4 w-4" />
-            {isGenerating ? "Generating..." : "Generate All"}
+            {isGenerating ? "Generating..." : `Generate All (${files.length})`}
           </Button>
           <Button variant="outline" onClick={onExport} className="gap-2">
             <Download className="h-4 w-4" />

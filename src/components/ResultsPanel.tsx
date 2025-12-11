@@ -1,4 +1,6 @@
-import { ImageIcon } from "lucide-react";
+import { useState } from "react";
+import { ImageIcon, Copy, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Result {
   id: string;
@@ -13,6 +15,15 @@ interface ResultsPanelProps {
 }
 
 const ResultsPanel = ({ results }: ResultsPanelProps) => {
+  const [selectedResult, setSelectedResult] = useState<string | null>(
+    results.length > 0 ? results[0].id : null
+  );
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    alert(`${label} copied to clipboard!`);
+  };
+
   if (results.length === 0) {
     return (
       <div className="bg-card rounded-lg border border-border p-8 text-center">
@@ -25,42 +36,155 @@ const ResultsPanel = ({ results }: ResultsPanelProps) => {
     );
   }
 
+  const currentResult = results.find((r) => r.id === selectedResult) || results[0];
+
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden">
-      <div className="p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground">Generated Results ({results.length})</h3>
+    <div className="space-y-6">
+      {/* Results List */}
+      <div className="bg-card rounded-lg border border-border overflow-hidden">
+        <div className="p-4 border-b border-border">
+          <h3 className="font-semibold text-foreground">
+            All {results.length} item processed | Total: {(results.length * 1.6).toFixed(1)} MB
+          </h3>
+        </div>
+        <div className="divide-y divide-border max-h-[300px] overflow-auto">
+          {results.map((result) => (
+            <button
+              key={result.id}
+              onClick={() => setSelectedResult(result.id)}
+              className={`w-full p-4 text-left hover:bg-secondary/50 transition-colors border-l-4 ${
+                selectedResult === result.id
+                  ? "border-l-primary bg-secondary/30"
+                  : "border-l-transparent"
+              }`}
+            >
+              <p className="text-sm text-muted-foreground mb-1">{result.filename}</p>
+              <p className="font-medium text-foreground truncate">{result.title}</p>
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="divide-y divide-border max-h-[400px] overflow-auto">
-        {results.map((result) => (
-          <div key={result.id} className="p-4 hover:bg-secondary/50 transition-colors">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-secondary rounded flex items-center justify-center flex-shrink-0">
-                <ImageIcon className="h-8 w-8 text-muted-foreground" />
+
+      {/* Detail View */}
+      {currentResult && (
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+            {/* Left: Image Preview */}
+            <div className="lg:border-r border-border p-6 flex flex-col items-center justify-center bg-secondary/30">
+              <div className="w-full aspect-square max-w-xs bg-secondary rounded-lg border border-border flex items-center justify-center mb-4">
+                <ImageIcon className="h-24 w-24 text-muted-foreground" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-muted-foreground mb-1">{result.filename}</p>
-                <h4 className="font-medium text-foreground mb-1 truncate">{result.title}</h4>
-                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{result.description}</p>
-                <div className="flex flex-wrap gap-1">
-                  {result.keywords.slice(0, 5).map((keyword, i) => (
+              <p className="text-xs text-muted-foreground text-center mb-2">
+                {currentResult.filename}
+              </p>
+              <p className="text-xs text-muted-foreground text-center">
+                Size: 1628.4kB → 21.0kB
+              </p>
+            </div>
+
+            {/* Right: Metadata Details */}
+            <div className="lg:col-span-2 p-6 space-y-6">
+              {/* Title */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-primary flex items-center gap-2">
+                    <span>T</span> Title
+                  </label>
+                  <span className="text-xs text-muted-foreground">
+                    {currentResult.title.length} characters
+                  </span>
+                </div>
+                <textarea
+                  value={currentResult.title}
+                  readOnly
+                  className="w-full p-3 bg-secondary border border-border rounded text-sm text-foreground resize-none"
+                  rows={2}
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-primary flex items-center gap-2">
+                    <span>📋</span> Description
+                  </label>
+                  <span className="text-xs text-muted-foreground">
+                    {currentResult.description.length} characters
+                  </span>
+                </div>
+                <textarea
+                  value={currentResult.description}
+                  readOnly
+                  className="w-full p-3 bg-secondary border border-border rounded text-sm text-foreground resize-none"
+                  rows={4}
+                />
+              </div>
+
+              {/* Keywords */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-primary flex items-center gap-2">
+                    <span>🏷️</span> Keywords ({currentResult.keywords.length})
+                  </label>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {currentResult.keywords.map((keyword, i) => (
                     <span
                       key={i}
-                      className="px-2 py-0.5 bg-secondary text-xs text-muted-foreground rounded"
+                      className="px-3 py-1.5 bg-secondary border border-border text-xs text-foreground rounded-full font-medium"
                     >
                       {keyword}
                     </span>
                   ))}
-                  {result.keywords.length > 5 && (
-                    <span className="px-2 py-0.5 text-xs text-muted-foreground">
-                      +{result.keywords.length - 5} more
-                    </span>
-                  )}
                 </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(currentResult.title, "Title")}
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy Title
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    copyToClipboard(currentResult.description, "Description")
+                  }
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy Description
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    copyToClipboard(currentResult.keywords.join(", "), "Keywords")
+                  }
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy Keywords
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="gap-2 ml-auto"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Regenerate
+                </Button>
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

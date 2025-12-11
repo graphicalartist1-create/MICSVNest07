@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import GenerationControls from "@/components/GenerationControls";
 import FileUpload from "@/components/FileUpload";
 import ResultsPanel from "@/components/ResultsPanel";
+import GenerationProgress from "@/components/GenerationProgress";
 import HowToUseButton from "@/components/HowToUseButton";
 
 interface GenerationSettings {
@@ -71,26 +72,94 @@ const Index = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [currentFile, setCurrentFile] = useState("");
+  const [processedFiles, setProcessedFiles] = useState(0);
+  const [generationTimer, setGenerationTimer] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Check if user is signed in
+    const userProfile = localStorage.getItem("userProfile");
+    setIsSignedIn(!!userProfile);
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      const profile = localStorage.getItem("userProfile");
+      setIsSignedIn(!!profile);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const handleGenerate = () => {
     if (files.length === 0) return;
     
     setIsGenerating(true);
+    setProgress(0);
+    setProcessedFiles(0);
+    setCurrentFile("");
     
-    // Simulate generation (in real app, this would call AI API)
-    const timer = setTimeout(() => {
-      const newResults: Result[] = files.map((file, i) => ({
-        id: `${Date.now()}-${i}`,
-        filename: file.name,
-        title: `Generated title for ${file.name}`,
-        description: `AI-generated description for the image ${file.name}. This would contain relevant metadata for stock photo platforms.`,
-        keywords: ["stock", "photo", "image", "digital", "creative", "design", "professional", "high-quality"],
-      }));
-      setResults(newResults);
-      setIsGenerating(false);
-    }, 2000);
+    const newResults: Result[] = [];
+    let currentIndex = 0;
+    let isCancelled = false;
     
-    return () => clearTimeout(timer);
+    const processNextFile = () => {
+      if (isCancelled || currentIndex >= files.length) {
+        setResults(newResults);
+        setIsGenerating(false);
+        setProgress(100);
+        return;
+      }
+      
+      const file = files[currentIndex];
+      setCurrentFile(file.name);
+      
+      // Simulate processing each file
+      const processingTime = 800 + Math.random() * 600; // 800-1400ms per file
+      const timer = setTimeout(() => {
+        if (isCancelled) {
+          setIsGenerating(false);
+          return;
+        }
+
+        newResults.push({
+          id: `${Date.now()}-${currentIndex}`,
+          filename: file.name,
+          title: `Generated title for ${file.name}`,
+          description: `AI-generated description for the image ${file.name}. This would contain relevant metadata for stock photo platforms.`,
+          keywords: ["stock", "photo", "image", "digital", "creative", "design", "professional", "high-quality"],
+        });
+        
+        currentIndex++;
+        setProcessedFiles(currentIndex);
+        const newProgress = Math.min(95, (currentIndex / files.length) * 95);
+        setProgress(newProgress);
+        
+        processNextFile();
+      }, processingTime);
+      
+      setGenerationTimer(timer);
+    };
+    
+    processNextFile();
+  };
+
+  const handleCancelGeneration = () => {
+    if (generationTimer) {
+      clearTimeout(generationTimer);
+    }
+    setIsGenerating(false);
+    setProgress(0);
+    setProcessedFiles(0);
+    setCurrentFile("");
+    setResults([]);
+  };
+
+  const handleClearResults = () => {
+    setResults([]);
+    setProgress(0);
   };
 
   const handleExport = () => {
@@ -135,7 +204,9 @@ const Index = () => {
               onFilesChange={setFiles}
               onGenerate={handleGenerate}
               onExport={handleExport}
+              onClearResults={handleClearResults}
               isGenerating={isGenerating}
+              isSignedIn={isSignedIn}
             />
             
             <ResultsPanel results={results} />
@@ -144,6 +215,16 @@ const Index = () => {
       </main>
 
       <HowToUseButton />
+      
+      {/* Generation Progress Bar */}
+      <GenerationProgress
+        isVisible={isGenerating}
+        progress={progress}
+        currentFile={currentFile}
+        totalFiles={files.length}
+        processedFiles={processedFiles}
+        onCancel={handleCancelGeneration}
+      />
     </div>
   );
 };

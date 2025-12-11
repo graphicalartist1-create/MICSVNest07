@@ -49,13 +49,184 @@ function extractKeywordsFromFilename(filename: string): string[] {
   return baseName.split(/[-_\s]+/).filter(word => word.length > 2);
 }
 
-function generateAdvancedTitle(filename: string, settings: GenerationSettings): string {
-  const baseName = filename.replace(/\.[^/.]+$/, "");
+// Analyze image to extract visual characteristics
+async function analyzeImage(file: File): Promise<{
+  dominantColors: string[];
+  brightness: "dark" | "light" | "medium";
+  complexity: "simple" | "complex";
+  hasText: boolean;
+  estimatedSubject: string;
+}> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Canvas-based image analysis
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve({
+            dominantColors: ["blue", "gray"],
+            brightness: "medium",
+            complexity: "simple",
+            hasText: false,
+            estimatedSubject: "image",
+          });
+          return;
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        // Analyze colors and brightness
+        let r = 0, g = 0, b = 0, brightness = 0;
+        let edgeCount = 0;
+        const colorMap: { [key: string]: number } = {};
+
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          brightness += (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+          // Simple edge detection for complexity
+          if (i + 4 < data.length) {
+            const diff = Math.abs(data[i] - data[i + 4]) + 
+                        Math.abs(data[i + 1] - data[i + 5]) + 
+                        Math.abs(data[i + 2] - data[i + 6]);
+            if (diff > 30) edgeCount++;
+          }
+
+          // Color categorization
+          const colorName = getColorName(data[i], data[i + 1], data[i + 2]);
+          colorMap[colorName] = (colorMap[colorName] || 0) + 1;
+        }
+
+        const pixelCount = data.length / 4;
+        const avgR = Math.floor(r / pixelCount);
+        const avgG = Math.floor(g / pixelCount);
+        const avgB = Math.floor(b / pixelCount);
+        const avgBrightness = Math.floor(brightness / pixelCount);
+        const complexityScore = edgeCount / pixelCount;
+
+        const dominantColors = Object.entries(colorMap)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 3)
+          .map(([color]) => color);
+
+        const brightnessLevel = avgBrightness > 200 ? "light" : avgBrightness > 100 ? "medium" : "dark";
+        const complexity = complexityScore > 0.1 ? "complex" : "simple";
+
+        // Estimate subject based on color and structure
+        const estimatedSubject = estimateSubjectFromAnalysis(avgR, avgG, avgB, complexity);
+
+        resolve({
+          dominantColors: dominantColors.length > 0 ? dominantColors : ["unknown"],
+          brightness: brightnessLevel,
+          complexity,
+          hasText: edgeCount > pixelCount * 0.2, // High edge density might indicate text
+          estimatedSubject,
+        });
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function getColorName(r: number, g: number, b: number): string {
+  // Determine dominant color channel
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const gray = max - min < 30;
+
+  if (gray) {
+    return r > 200 ? "white" : r < 50 ? "black" : "gray";
+  }
+
+  if (r === max) {
+    return r > 150 && g < 100 ? "red" : "orange";
+  }
+  if (g === max) {
+    return g > 150 ? "green" : "yellow";
+  }
+  if (b === max) {
+    return b > 150 ? "blue" : "purple";
+  }
+  return "gray";
+}
+
+function estimateSubjectFromAnalysis(r: number, g: number, b: number, complexity: "simple" | "complex"): string {
+  // Simple heuristic to estimate what the image might contain
+  if (g > r && g > b && g > 100) {
+    return complexity === "complex" ? "nature" : "solid";
+  }
+  if (b > 100 && r < 100 && g < 100) {
+    return "sky"; // Likely has sky
+  }
+  if (r > 150 && g > 100 && b < 100) {
+    return "warm"; // Warm-toned
+  }
+  if (complexity === "complex") {
+    return "detailed";
+  }
+  return "general";
+}
+
+function generateAdvancedTitle(imageName: string, analysis: {
+  dominantColors: string[];
+  brightness: "dark" | "light" | "medium";
+  complexity: "simple" | "complex";
+  hasText: boolean;
+  estimatedSubject: string;
+}, settings: GenerationSettings): string {
+  const baseName = imageName.replace(/\.[^/.]+$/, "");
   
-  // Clean up filename
-  let title = baseName
+  // Build title from analysis
+  const subjectWords = {
+    nature: ["Natural Landscape", "Scenic Photography", "Nature Scene"],
+    sky: ["Sky Scenery", "Outdoor View", "Sky Photography"],
+    warm: ["Warm Toned Photo", "Golden Hour Scene", "Warm Photography"],
+    detailed: ["Detailed Composition", "Complex Scene", "Intricate Photography"],
+    solid: ["Minimalist Image", "Simple Composition", "Clean Design"],
+    general: ["Professional Image", "Stock Photography", "Quality Image"],
+  };
+
+  const brightnessWords = {
+    dark: "Dark",
+    light: "Bright",
+    medium: "Balanced",
+  };
+
+  const complexityWords = {
+    complex: "Detailed",
+    simple: "Minimalist",
+  };
+
+  // Generate title from analysis
+  const subject = subjectWords[analysis.estimatedSubject as keyof typeof subjectWords]?.[0] || "Image";
+  const brightness = brightnessWords[analysis.brightness];
+  const complexityDesc = complexityWords[analysis.complexity];
+  const colorDesc = analysis.dominantColors[0]?.charAt(0).toUpperCase() + (analysis.dominantColors[0]?.slice(1) || "");
+
+  let title = `${brightness} ${complexityDesc} ${subject}`;
+  
+  // Add filename words if they're meaningful
+  const filenameWords = baseName
     .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+    .split(/\s+/)
+    .filter(w => w.length > 3)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
+  if (filenameWords && filenameWords.length > 0 && filenameWords.length < 30) {
+    title = `${filenameWords} - ${colorDesc} ${subject}`;
+  }
 
   // Add prefix if enabled
   if (settings.prefix && settings.prefixText) {
@@ -138,12 +309,13 @@ export async function generateMetadata(
   file: File,
   settings: GenerationSettings
 ): Promise<GeneratedMetadata> {
+  // First, analyze the image
+  const analysis = await analyzeImage(file);
+  
+  // Then generate metadata based on analysis
   return new Promise((resolve) => {
-    // Simulate image analysis delay (in real app, this would call Google Vision API or similar)
-    const delay = Math.random() * 800 + 300; // 300-1100ms
-    
     setTimeout(() => {
-      const title = generateAdvancedTitle(file.name, settings);
+      const title = generateAdvancedTitle(file.name, analysis, settings);
       const { short: shortDescription, long: longDescription } = generateAdvancedDescription(file.name, settings);
       const keywords = generateAdvancedKeywords(file.name, settings);
 
@@ -153,7 +325,7 @@ export async function generateMetadata(
         longDescription,
         keywords,
       });
-    }, delay);
+    }, 300); // Reduced delay since analysis already took time
   });
 }
 
