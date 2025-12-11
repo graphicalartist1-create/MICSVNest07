@@ -26,8 +26,7 @@ interface GenerationSettings {
 
 interface GeneratedMetadata {
   title: string;
-  shortDescription: string;
-  longDescription: string;
+  description: string;
   keywords: string[];
 }
 
@@ -52,16 +51,6 @@ function generateTitle(filename: string, settings: GenerationSettings): string {
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 
-  // Add prefix if enabled
-  if (settings.prefix && settings.prefixText) {
-    title = `${settings.prefixText} ${title}`;
-  }
-
-  // Add suffix if enabled
-  if (settings.suffix && settings.suffixText) {
-    title = `${title} ${settings.suffixText}`;
-  }
-
   // Truncate to specified length
   if (title.length > settings.titleLength) {
     title = title.substring(0, settings.titleLength).trim();
@@ -70,18 +59,12 @@ function generateTitle(filename: string, settings: GenerationSettings): string {
   return title;
 }
 
-function generateDescription(filename: string, settings: GenerationSettings): { short: string; long: string } {
+function generateDescription(filename: string, settings: GenerationSettings): string {
   const baseName = filename.replace(/\.[^/.]+$/, "");
-  const imageTypeText = settings.imageType !== "none" ? settings.imageType : "image";
 
-  const shortDesc = `Professional ${imageTypeText} featuring ${baseName.replace(/[-_]/g, " ").toLowerCase()}.`;
+  const description = `Professional image featuring ${baseName.replace(/[-_]/g, " ").toLowerCase()}. Optimized for stock photo platforms.`;
   
-  const longDesc = `This high-quality ${imageTypeText} showcases ${baseName.replace(/[-_]/g, " ").toLowerCase()}. Perfect for use in ${settings.platform} or other stock photo platforms. The image is optimized for various applications and can be used for creative projects, commercial purposes, and more. Available in high resolution for all your needs.`;
-
-  return {
-    short: shortDesc.substring(0, settings.descriptionLength),
-    long: longDesc.substring(0, settings.descriptionLength * 2),
-  };
+  return description.substring(0, settings.descriptionLength);
 }
 
 function generateKeywords(filename: string, settings: GenerationSettings): string[] {
@@ -102,11 +85,6 @@ function generateKeywords(filename: string, settings: GenerationSettings): strin
     keywords.add(settings.imageType);
   }
 
-  // Add platform-related keywords
-  keywords.add(settings.platform);
-  keywords.add("stock photo");
-  keywords.add("royalty free");
-
   // Add relevant sample keywords based on image type
   const sampleKeywords = keywordSamples[settings.imageType as keyof typeof keywordSamples] || keywordSamples.abstract;
   sampleKeywords.forEach((keyword) => {
@@ -114,14 +92,6 @@ function generateKeywords(filename: string, settings: GenerationSettings): strin
       keywords.add(keyword);
     }
   });
-
-  // Add negative keywords if enabled
-  if (settings.negativeKeywords && settings.negativeKeywordsText) {
-    const negativeWords = settings.negativeKeywordsText.split(",").map((w) => w.trim());
-    negativeWords.forEach((word) => {
-      keywords.delete(word.toLowerCase());
-    });
-  }
 
   // Convert to array and limit to specified count
   const keywordArray = Array.from(keywords).slice(0, settings.keywordsCount);
@@ -145,13 +115,12 @@ export async function generateMetadata(
     // Simulate API call delay
     setTimeout(() => {
       const title = generateTitle(file.name, settings);
-      const { short: shortDescription, long: longDescription } = generateDescription(file.name, settings);
+      const description = generateDescription(file.name, settings);
       const keywords = generateKeywords(file.name, settings);
 
       resolve({
         title,
-        shortDescription,
-        longDescription,
+        description,
         keywords,
       });
     }, 300);

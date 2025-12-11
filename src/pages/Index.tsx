@@ -87,7 +87,7 @@ const Index = () => {
         id: `${Date.now()}-${i}`,
         filename: file.name,
         title: metadataResults[i].title,
-        description: metadataResults[i].shortDescription,
+        description: metadataResults[i].description,
         keywords: metadataResults[i].keywords,
       }));
       
