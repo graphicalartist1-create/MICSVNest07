@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Copy, Check, ExternalLink } from "lucide-react";
+import { X, Copy, Check, ExternalLink, Sparkles, Zap, Cpu, Route, Bolt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,11 +20,11 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const providers = [
-    { id: "gemini", name: "Google Gemini", badge: "Paid & Free", color: "bg-cyan-500" },
-    { id: "mistral", name: "Mistral AI", badge: "Paid", color: "bg-orange-500" },
-    { id: "openai", name: "OpenAI", badge: "Paid", color: "bg-orange-500" },
-    { id: "openrouter", name: "OpenRouter", badge: "Paid & Free", color: "bg-orange-500" },
-    { id: "groq", name: "Groq", badge: "Free", color: "bg-green-500" },
+    { id: "gemini", name: "Google Gemini", badge: "Paid & Free", color: "bg-cyan-500", icon: Sparkles },
+    { id: "mistral", name: "Mistral AI", badge: "Paid", color: "bg-orange-500", icon: Zap },
+    { id: "openai", name: "OpenAI", badge: "Paid", color: "bg-orange-500", icon: Cpu },
+    { id: "openrouter", name: "OpenRouter", badge: "Paid & Free", color: "bg-orange-500", icon: Route },
+    { id: "groq", name: "Groq", badge: "Free", color: "bg-green-500", icon: Bolt },
   ];
 
   const currentProvider = providers.find(p => p.id === selectedProvider);
@@ -91,25 +91,28 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         <div className="mb-8">
           <h3 className="text-sm font-semibold text-foreground mb-4">Select AI Provider</h3>
           <div className="flex flex-wrap gap-3">
-            {providers.map((provider) => (
-              <button
-                key={provider.id}
-                onClick={() => setSelectedProvider(provider.id as any)}
-                className={`relative px-4 py-3 rounded-lg border-2 transition-all ${
-                  selectedProvider === provider.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-muted-foreground"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full" />
-                  <span className="text-sm font-medium text-foreground">{provider.name}</span>
-                </div>
-                <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white ${provider.color}`}>
-                  {provider.badge}
-                </span>
-              </button>
-            ))}
+            {providers.map((provider) => {
+              const IconComponent = provider.icon;
+              return (
+                <button
+                  key={provider.id}
+                  onClick={() => setSelectedProvider(provider.id as any)}
+                  className={`relative px-4 py-3 rounded-lg border-2 transition-all ${
+                    selectedProvider === provider.id
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <IconComponent className="w-4 h-4" />
+                    <span className="text-sm font-medium text-foreground">{provider.name}</span>
+                  </div>
+                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white ${provider.color}`}>
+                    {provider.badge}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
