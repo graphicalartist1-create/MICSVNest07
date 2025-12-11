@@ -96,18 +96,18 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background border border-border">
-        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+      <DialogContent className="max-w-6xl max-h-screen bg-background border border-border p-6">
+        <DialogHeader className="flex flex-row items-center justify-between space-y-0 mb-4">
           <DialogTitle className="text-2xl font-bold text-foreground">API Secrets Management</DialogTitle>
         </DialogHeader>
 
-        <div className="text-sm text-muted-foreground mb-6">
+        <div className="text-sm text-muted-foreground mb-4">
           Manage your AI provider API keys. Keys are stored locally and securely.
         </div>
 
         {/* Provider Selection */}
-        <div className="mb-8">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Select AI Provider</h3>
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Select AI Provider</h3>
           <div className="flex flex-wrap gap-3">
             {providers.map((provider) => {
               const IconComponent = provider.icon;
@@ -134,9 +134,9 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left: Configuration */}
-          <div className="border border-border rounded-lg p-6 bg-secondary/30">
+          <div className="border border-border rounded-lg p-4 bg-secondary/30">
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {currentProvider?.name} Configuration
             </h3>
@@ -279,7 +279,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
           </div>
 
           {/* Right: Stored Keys */}
-          <div className="border border-border rounded-lg p-6 bg-secondary/30">
+          <div className="border border-border rounded-lg p-4 bg-secondary/30">
             <h3 className="text-lg font-semibold text-foreground mb-2">
               Stored Keys <span className="text-muted-foreground text-sm font-normal">({storedKeys.length})</span>
             </h3>
@@ -358,7 +358,7 @@ const APISecretsModal = ({ open, onOpenChange }: APISecretsModalProps) => {
         </div>
 
         {/* Close Button */}
-        <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-border">
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
